@@ -1,6 +1,7 @@
 
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
 
 Widget _defaultTransitionBuilder(Widget child, Animation<double> animation) =>
     ScaleTransition(
@@ -25,18 +26,18 @@ class IconToggle extends StatefulWidget {
   final Color activeColor;
   final Color inactiveColor;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
   final AnimatedSwitcherTransitionBuilder transitionBuilder;
   final Duration duration;
-  final Duration reverseDuration;
+  final Duration? reverseDuration;
   @override
   _IconToggleState createState() => _IconToggleState();
 }
 
 class _IconToggleState extends State<IconToggle>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _position;
+  late AnimationController _controller;
+  late Animation<double> _position;
   bool _cancel = false;
 
   @override
@@ -51,14 +52,15 @@ class _IconToggleState extends State<IconToggle>
       if (status == AnimationStatus.dismissed &&
           widget.onChanged != null &&
           _cancel == false) {
-        widget.onChanged(!widget.value);
+
+        widget.onChanged!(!widget.value);
       }
     });
   }
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -102,14 +104,15 @@ class _IconToggleState extends State<IconToggle>
 
 class _IconToggleable<T> extends AnimatedWidget {
   _IconToggleable({
-    Animation<T> listenable,
+    required this.listenable,
     this.activeColor,
     this.inactiveColor,
     this.child,
   }) : super(listenable: listenable);
-  final Color activeColor;
-  final Color inactiveColor;
-  final Widget child;
+  final Animation<double> listenable;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final Widget? child;
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -125,20 +128,20 @@ class _IconToggleable<T> extends AnimatedWidget {
 
 class _IconPainter extends CustomPainter {
   _IconPainter({
-    @required this.position,
+    required this.position,
     this.activeColor,
     this.inactiveColor,
   });
   final Animation<double> position;
-  final Color activeColor;
-  final Color inactiveColor;
+  final Color? activeColor;
+  final Color? inactiveColor;
 
   double get _value => position != null ? position.value : 0;
 
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Color.lerp(inactiveColor, activeColor, _value)
+      ..color = Color.lerp(inactiveColor, activeColor, _value)!
           .withOpacity(math.min(_value, 0.15))
       ..style = PaintingStyle.fill
       ..strokeWidth = 2.0;
